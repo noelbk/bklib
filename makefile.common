@@ -1,0 +1,381 @@
+.SUFFIXES: .x .h .c .dep
+
+.c$o:
+	$(CC) $(CFLAGS) -c $<
+
+.cpp$o:
+	$(CC) $(CFLAGS) -c $<
+
+.rc.res:
+	rc $<
+
+.x.h:
+	rpcgen -h $< > $@
+
+.x.c: 
+	rpcgen -c -o $@ $<
+
+#---------------------------------------------------------------------
+
+compile_test = service_t$x service_control_t$x hash_t$x array_t$x array_bsearch_t$x cryptbk_t$x cryptbk_md5_t$x netpkt_t$x logon_t$x pool_t$x proc_pipe_t$x http_t$x alloc_count_t$x debug_leak_t$x ifcfg_t$x ipconfig_t$x dns_t$x fdselect_pipe_t$x
+compile_bin = service_install$x http_get$x http_server$x 
+
+compile_lib = libbk$l libbklogon$l cryptbk$l libbkdebug$l
+compile_all = $(compile_lib) $(compile_bin) $(compile_test)
+
+all: makefile.dep $(compile_bin) $(compile_lib) $(compile_test)
+
+install: .phony
+
+install_lib=libbk$l libbklogon$l cryptbk$l
+
+install_h=array.h bitops.h cfg.h cfg_crypt.h config.h configbk.h cryptbk.h debug.h debug_leak.h debug_stdio.h defutil.h dir.h dns.h dns_proxy.h env.h eth_util.h fdselect.h fdselect_pipe.h hash.h http.h http_req.h ifcfg.h ipconfig.h ipconntrack.h itypes.h llist.h logon.h memutil.h mstime.h netpkt.h netpkt_inet.h opt.h os_unix.h os_win32.h pack.h pool.h proc.h rand.h readable.h rtt.h service.h sig.h sock.h sock_raw.h sock_send_fd.h state.h str.h test_certs.h thread.h tstat.h update.h variant.h vercmp.h warn.h warn_unix.h warn_win32.h array_inline.c alloc_count.h opt_print.h console.h
+
+install-dev: $(install_lib) $(install_h) .phony
+	mkdir -p $(DESTDIR)/usr/lib
+	cp $(install_lib) $(DESTDIR)/usr/lib
+	mkdir -p $(DESTDIR)/usr/include/bklib
+	cp $(install_h) $(DESTDIR)/usr/include/bklib
+
+deb:
+	debuild
+
+cryptbk$o: openssl
+
+cryptbk_objs=cryptbk$o cfg_crypt$o 
+cryptbk_libs=$(cryptbk_libs_os)
+cryptbk$l: $(cryptbk_objs) openssl
+	$(LINK_LIB) $(cryptbk_objs) $(openssl_libs)
+
+debug_leak_t_objs=debug_leak_t$o libbk$l
+debug_leak_t_libs=$(libbk_libs)
+debug_leak_t$x: $(debug_leak_t_objs)
+	$(LINK_EXE) $(debug_leak_t_objs) $(debug_leak_t_libs)
+
+llist_t_objs=llist_t$o libbk$l
+llist_t_libs=$(libbk_libs)
+llist_t$x: $(llist_t_objs)
+	$(LINK_EXE) $(llist_t_objs) $(llist_t_libs)
+
+ifcfg_t_objs=ifcfg_t$o libbk$l
+ifcfg_t_libs=$(libbk_libs)
+ifcfg_t$x: $(ifcfg_t_objs)
+	$(LINK_EXE) $(ifcfg_t_objs) $(ifcfg_t_libs)
+
+ipconfig_t_objs=ipconfig_t$o libbk$l
+ipconfig_t_libs=$(libbk_libs)
+ipconfig_t$x: $(ipconfig_t_objs)
+	$(LINK_EXE) $(ipconfig_t_objs) $(ipconfig_t_libs)
+
+alloc_count_t_objs=alloc_count_t$o libbk$l
+alloc_count_t_libs=$(libbk_libs)
+alloc_count_t$x: $(alloc_count_t_objs)
+	$(LINK_EXE) $(alloc_count_t_objs) $(alloc_count_t_libs)
+
+readable_t_objs=readable_t$o libbk$l
+readable_t_libs=$(libbk_libs)
+readable_t$x: $(readable_t_objs)
+	$(LINK_EXE) $(readable_t_objs) $(readable_t_libs)
+
+http_t_objs=http_t$o libbk$l
+http_t_libs=$(libbk_libs)
+http_t$x: $(http_t_objs)
+	$(LINK_EXE) $(http_t_objs) $(http_t_libs)
+
+dns_proxy_t_objs=dns_proxy_t$o libbk$l
+dns_proxy_t_libs=$(libbk_libs)
+dns_proxy_t$x: $(dns_proxy_t_objs)
+	$(LINK_EXE) $(dns_proxy_t_objs) $(dns_proxy_t_libs)
+
+http_get_objs=http_get$o libbk$l
+http_get_libs=$(libbk_libs)
+http_get$x: $(http_get_objs)
+	$(LINK_EXE) $(http_get_objs) $(http_get_libs)
+
+http_server_objs=http_server$o libbk$l
+http_server_libs=$(libbk_libs)
+http_server$x: $(http_server_objs)
+	$(LINK_EXE) $(http_server_objs) $(http_server_libs)
+
+http_router_objs=http_router$o libbk$l
+http_router_libs=$(libbk_libs)
+http_router$x: $(http_router_objs)
+	$(LINK_EXE) $(http_router_objs) $(http_router_libs)
+
+fdselect_pipe_t_objs=fdselect_pipe_t$o libbk$l
+fdselect_pipe_t_libs=$(libbk_libs)
+fdselect_pipe_t$x: $(fdselect_pipe_t_objs)
+	$(LINK_EXE) $(fdselect_pipe_t_objs) $(fdselect_pipe_t_libs)
+
+cryptbk_t_objs=cryptbk_t$o libbk$l cryptbk$l
+cryptbk_t_libs=$(libbk_libs) $(cryptbk_libs)
+cryptbk_t$x: $(cryptbk_t_objs)
+	$(LINK_EXE) $(cryptbk_t_objs) $(cryptbk_t_libs)
+
+cryptbk_priv_t_objs=cryptbk_priv_t$o libbk$l cryptbk$l test_certs$o
+cryptbk_priv_t_libs=$(libbk_libs) $(cryptbk_libs)
+cryptbk_priv_t$x: $(cryptbk_priv_t_objs)
+	$(LINK_EXE) $(cryptbk_priv_t_objs) $(cryptbk_priv_t_libs)
+
+cryptbk_selfsign_t_objs=cryptbk_selfsign_t$o libbk$l cryptbk$l
+cryptbk_selfsign_t_libs=$(libbk_libs) $(cryptbk_libs)
+cryptbk_selfsign_t$x: $(cryptbk_selfsign_t_objs)
+	$(LINK_EXE) $(cryptbk_selfsign_t_objs) $(cryptbk_selfsign_t_libs)
+
+cryptbk_md5_t_objs=cryptbk_md5_t$o libbk$l cryptbk$l
+cryptbk_md5_t_libs=$(libbk_libs) $(cryptbk_libs)
+cryptbk_md5_t$x: $(cryptbk_md5_t_objs)
+	$(LINK_EXE) $(cryptbk_md5_t_objs) $(cryptbk_md5_t_libs)
+
+ipconntrack_t_objs=ipconntrack_t$o libbk$l
+ipconntrack_t_libs=$(libbk_libs)
+ipconntrack_t$x: $(ipconntrack_t_objs)
+	$(LINK_EXE) $(ipconntrack_t_objs) $(ipconntrack_t_libs)
+
+t_gmt_objs=t_gmt$o libbk$l
+t_gmt_libs=$(libbk_libs)
+t_gmt$x: $(t_gmt_objs)
+	$(LINK_EXE) $(t_gmt_objs) $(t_gmt_libs)
+
+.phony:
+
+../sqlite/sqlite$l: .phony
+	cd ../sqlite && $(MAKE_CMD)
+
+ipconntrack_db_objs=ipconntrack_db$o libbk$l ../sqlite/sqlite$l
+ipconntrack_db_libs=$(libbk_libs)
+ipconntrack_db$x: $(ipconntrack_db_objs)
+	$(LINK_EXE) $(ipconntrack_db_objs) $(ipconntrack_db_libs)
+
+
+debug_t_objs = debug_t$o debug$o libbk$l
+debug_t$x: $(debug_t_objs)
+	$(LINK_EXE) $(debug_t_objs) $(libbk_libs)
+
+dir_t_objs = dir_t$o libbk$l
+dir_t$x: $(dir_t_objs)
+	$(LINK_EXE) $(dir_t_objs) $(libbk_libs)
+
+proc_t_objs = proc_t$o libbk$l
+proc_t$x: $(proc_t_objs)
+	$(LINK_EXE) $(proc_t_objs) $(libbk_libs)
+
+bitops_t$o: bitops.h
+bitops_t_objs = bitops_t$o libbk$l
+bitops_t$x: $(bitops_t_objs)
+	$(LINK_EXE) $(bitops_t_objs) $(libbk_libs)
+
+netpkt_dump_objs = netpkt_dump$o libbk$l
+netpkt_dump$x: $(netpkt_dump_objs)
+	$(LINK_EXE) $(netpkt_dump_objs) $(libbk_libs)
+
+netpkt_t_objs = netpkt_t$o libbk$l
+netpkt_t$x: $(netpkt_t_objs)
+	$(LINK_EXE) $(netpkt_t_objs) $(libbk_libs)
+
+cryptbk_req_objs = cryptbk_req$o libbk$l
+cryptbk_req_libs = $(libbk_libs)
+cryptbk_req$x: $(cryptbk_req_objs)
+	$(LINK_EXE) $(cryptbk_req_objs) $(cryptbk_req_libs) 
+
+libbk_objs=tstat$o pool$o readable$o array$o fdselect$o fdselect_pipe$o hash$o http$o http_req$o mstime$o rand$o sock$o debug$o debug_leak$o memutil$o eth_util$o netpkt$o state$o proc$o shell$o cfg$o dir$o debug_stdio$o opt$o opt_print$o sig$o str$o dns$o env$o thread$o service$o ipconntrack$o dns_proxy$o vercmp$o alloc_count$o ifcfg$o ipconfig$o console$o $(libbk_objs_os)
+libbk_libs = $(libbk_libs_os)
+libbk$l: $(libbk_objs)
+	$(LINK_LIB) $(libbk_objs) 
+
+libbkdebug_objs=mstime$o debug$o debug_leak$o memutil$o debug_stdio$o thread$o alloc_count$o array$o hash$o opt$o dir$o $(libbk_objs_os) proc$o 
+libbkdebug_libs = $(libbkdebug_libs_os)
+libbkdebug$l: $(libbkdebug_objs)
+	$(LINK_LIB) $(libbkdebug_objs) 
+
+libbklogon_objs=logon$o $(libbklogon_objs_os)
+libbklogon_libs = $(libbklogon_libs_os)
+libbklogon$l: $(libbklogon_objs)
+	$(LINK_LIB) $(libbklogon_objs) 
+
+proc_pipe_t_objs = proc_pipe_t$o libbk$l
+proc_pipe_t$x: $(proc_pipe_t_objs)
+	$(LINK_EXE) $(proc_pipe_t_objs) $(libbk_libs)
+
+pool_t_objs = pool_t$o libbk$l
+pool_t$x: $(pool_t_objs)
+	$(LINK_EXE) $(pool_t_objs) $(libbk_libs)
+
+cfg_t_objs = cfg_t$o libbk$l
+cfg_t$x: $(cfg_t_objs)
+	$(LINK_EXE) $(cfg_t_objs) $(libbk_libs)
+
+logon_t_objs = logon_t$o logon$o libbk$l
+logon_t$x: $(logon_t_objs)
+	$(LINK_EXE) $(logon_t_objs) $(libbk_libs) $(logon_t_objs_os)
+
+thread_t_objs = thread_t$o libbk$l
+thread_t$x: $(thread_t_objs)
+	$(LINK_EXE) $(thread_t_objs) $(libbk_libs) $(thread_t_objs_os)
+
+sock_addrch_t_objs = sock_addrch_t$o libbk$l
+sock_addrch_t$x: $(sock_addrch_t_objs)
+	$(LINK_EXE) $(sock_addrch_t_objs) $(libbk_libs)
+
+array_t_objs = array_t$o libbk$l
+array_t$x: $(array_t_objs)
+	$(LINK_EXE) $(array_t_objs) $(libbk_libs)
+
+array_bsearch_t_objs = array_bsearch_t$o libbk$l
+array_bsearch_t$x: $(array_bsearch_t_objs)
+	$(LINK_EXE) $(array_bsearch_t_objs) $(libbk_libs)
+
+hash_t_objs = hash_t$o libbk$l
+hash_t$x: $(hash_t_objs)
+	$(LINK_EXE) $(hash_t_objs) $(libbk_libs)
+
+#fdselect_t_objs = fdselect_t$o libbk$l
+#fdselect_t$x: $(fdselect_t_objs)
+#	$(LINK_EXE) $(fdselect_t_objs) $(libbk_libs)
+
+rand_t_objs = rand_t$o libbk$l
+rand_t$x: $(rand_t_objs)
+	$(LINK_EXE) $(rand_t_objs) $(libbk_libs)
+
+dns_t_objs = dns_t$o libbk$l
+dns_t$x: $(dns_t_objs)
+	$(LINK_EXE) $(dns_t_objs) $(libbk_libs)
+
+dns_t_resolve_objs = dns_t_resolve$o libbk$l
+dns_t_resolve$x: $(dns_t_resolve_objs)
+	$(LINK_EXE) $(dns_t_resolve_objs) $(libbk_libs)
+
+service_t_objs = service_t$o libbk$l
+service_t_libs = $(libbk_libs)
+service_t$x: $(service_t_objs)
+	$(LINK_EXE) $(service_t_objs) $(service_t_libs)
+
+service_control_t_objs = service_control_t$o libbk$l
+service_control_t_libs = $(libbk_libs)
+service_control_t$x: $(service_control_t_objs)
+	$(LINK_EXE) $(service_control_t_objs) $(service_control_t_libs)
+
+service_install_objs = service_install$o libbk$l
+service_install_libs = $(libbk_libs)
+service_install$x: $(service_install_objs)
+	$(LINK_EXE) $(service_install_objs) $(service_install_libs)
+
+opt_t_objs = opt_t$o libbk$l
+opt_t$x: $(opt_t_objs)
+	$(LINK_EXE) $(opt_t_objs) $(libbk_libs)
+
+vercmp_t_objs = vercmp_t$o libbk$l
+vercmp_t$x: $(vercmp_t_objs)
+	$(LINK_EXE) $(vercmp_t_objs) $(libbk_libs)
+
+# fdselect_t$x only works under windows
+test_exe = opt_t$x rand_t$x hash_t$x array_t$x array_bsearch_t$x logon_t$x thread_t$x vercmp_t$x 
+test: $(test_exe)
+
+deps= \
+array.dep \
+array_inline.dep \
+alloc_count.dep \
+alloc_count_t.dep \
+array_t.dep \
+array_bsearch_t.dep \
+bitops_t.dep \
+cfg.dep \
+cfg_crypt.dep \
+cfg_t.dep \
+console.dep \
+cryptbk.dep \
+cryptbk_md5_t.dep \
+cryptbk_t.dep \
+cryptbk_priv_t.dep \
+cryptbk_selfsign_t.dep \
+cryptbk_t_utc.dep \
+cryptexe_t.dep \
+debug.dep \
+debug_leak.dep \
+debug_stdio.dep \
+debug_t.dep \
+dir.dep \
+dir_t.dep \
+dns.dep \
+dns_t.dep \
+dns_t_resolve.dep \
+env.dep \
+eth_util.dep \
+fdselect.dep \
+fdselect_t.dep \
+hash.dep \
+hash_t.dep \
+http.dep \
+llist_t.dep \
+ifcfg.dep \
+ifcfg_t.dep \
+ipconfig_t.dep \
+readable_t.dep \
+ipconntrack.dep \
+ipconntrack_db.dep \
+ipconntrack_t.dep \
+logon.dep \
+logon_t.dep \
+memutil.dep \
+mmapdb.dep \
+mstime.dep \
+netpkt.dep \
+netpkt_dump.dep \
+netpkt_inline.dep \
+netpkt_t.dep \
+opt.dep \
+opt_print.dep \
+opt_t.dep \
+pack.dep \
+pool.dep \
+pool_t.dep \
+proc.dep \
+proc_pipe_t.dep \
+proc_t.dep \
+rand.dep \
+rand_t.dep \
+readable.dep \
+rtt.dep \
+select.dep \
+service.dep \
+service_control_t.dep \
+service_install.dep \
+service_t.dep \
+sig.dep \
+sock.dep \
+sock_raw.dep \
+sock_send_fd.dep \
+ssl_digest_t.dep \
+ssl_rsa_t.dep \
+state.dep \
+str.dep \
+state_t.dep \
+t_gmt.dep \
+thread.dep \
+warn.dep
+
+dep: makefile.dep
+
+makefile.dep: $(deps)
+	cat $(deps) > $@
+
+include makefile.dep
+
+.c.dep:
+	$(CC) -E $(CFLAGS) $< | perl cpp2dep.pl $*$o $*.dep
+
+clean: 
+	$(RM) $(compile_all)
+	$(RM) *$o *$l
+	$(RM) .\#* \#* *~ core gmon.out
+	$(RM) *.obj *.ilk *.pdb *.dll 
+	$(RM) *_t$x
+	touch makefile.dep
+
+tar:
+	$(RM) -rf bklib
+	mkdir bklib
+	sh -c "cp $$(cat CVS/Entries | sed -ne 's/^\/\([^\/]*\)\/.*/\1/p') bklib"
+	touch bklib/makefile.dep
+	tar zcvf bklib.tar.gz bklib

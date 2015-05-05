@@ -1,0 +1,10 @@
+*.o
+*.dep
+*.map
+*.exe
+*.obj
+*.sln
+*.suo
+*.opt
+*.a
+*.lib

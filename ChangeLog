@@ -1,0 +1,5 @@
+2003-11-26  noel  <noel@burton-krahn.com>
+
+	* crypbk_t.c: all tests ok
+	* memdump.c: cleaned output for incomplete lines
+

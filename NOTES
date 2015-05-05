@@ -1,0 +1,8 @@
+wget http://www.openssl.org/source/openssl-0.9.7e.tar.gz
+tar zxf openssl-0.9.7e.tar.gz
+cd openssl-0.9.7e
+perl Configure VC-WIN32
+ms/do_masm
+nmake -f ms/nt.mak
+
+

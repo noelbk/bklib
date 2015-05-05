@@ -1,0 +1,37 @@
+#! /bin/sh
+
+cleanup() {
+    rm -f req.cfg key.pem.org
+}
+trap cleanup EXIT 
+
+FNAME="$1"
+if [ -z "$FNAME" ]; then
+  FNAME=etc/kserv
+fi
+
+rm -f req.cfg
+touch req.cfg
+chmod 0600 req.cfg
+cat <<EOF >>req.cfg
+[ req ]
+distinguished_name     = req_distinguished_name
+prompt                 = no
+
+[ req_distinguished_name ]
+O                      = KronoFusion
+OU                     = Desktop Server
+CN                     = demo.kronofusion.com
+emailAddress           = admin@kronofusion.com
+EOF
+
+openssl req -config req.cfg -x509 -out cert.pem -newkey rsa:1024 -keyout key.pem -passout pass:mypass
+mv key.pem key.pem.org
+openssl rsa -in key.pem.org -out key.pem -passin pass:mypass
+chmod 0600 key.pem
+chmod 0644 cert.pem
+openssl verify cert.pem
+#openssl s_server -cert cert.pem -key key.pem
+
+mv cert.pem $FNAME.cert
+mv key.pem $FNAME.key

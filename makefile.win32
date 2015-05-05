@@ -1,0 +1,44 @@
+OPENSSL=./openssl-0.9.7e
+openssl_libs=libeay32.lib 
+
+INCLUDE=$(INCLUDE);$(OPENSSL)/inc32;c:/vs6/ntddk/inc
+LIB=$(LIB);$(OPENSSL)/out32;c:/vs6/ntddk/lib/i386/checked
+
+#---------------------------------------------------------------------
+# win32
+l = .lib
+o = .obj
+x = .exe
+CFLAGS = /Zi /W3 /MT /nologo -I. -I.. $(INC_PATH)
+LINK_EXE = link /map:$*.map /out:$@ /debug /nodefaultlib:msvcrt.lib $(libbk_libs_os) 
+LINK_LIB = lib /out:$@ /debugtype:cv 
+RM = rm -f
+
+SHELL = c:/cygwin/bin/bash
+VB = vb6.exe
+WISE = "C:\Program Files\Wise Installation System\Wise9.exe"
+
+# os-specific libbk objects
+libbk_objs_os = variant$o ifcfg_win32$o winmm$o
+libbk_libs_os = ws2_32.lib kernel32.lib user32.lib ole32.lib oleaut32.lib user32.lib wbemuuid.lib advapi32.lib shell32.lib userenv.lib
+
+cryptbk_libs_os=user32.lib gdi32.lib
+
+include makefile.common
+
+openssl: $(OPENSSL)/out32/libeay32.lib
+
+openssl-0.9.7e.tar.gz: 
+	wget http://www.openssl.org/source/openssl-0.9.7e.tar.gz
+
+$(OPENSSL): openssl-0.9.7e.tar.gz
+	tar zxf openssl-0.9.7e.tar.gz
+
+$(OPENSSL)/out32/libeay32.lib: $(OPENSSL)
+	cd $(OPENSSL)
+	perl Configure VC-WIN32
+	ms\do_masm
+	nmake -f ms/nt.mak
+
+cryptbk$l: $(OPENSSL)/out32/libeay32.lib
+
