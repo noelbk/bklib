@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/sendfile.h>
+#include <fcntl.h>
 
 #include "sock.h"
 #include "sig.h"
@@ -28,10 +30,9 @@ typedef struct {
     int    recv_len;
     int    recv_max;
 
-    FILE  *send_file;
-    char   send_buf[HTTP_SERVER_CLIENT_BUF_MAX+1];
-    char  *send_ptr;
-    int    send_len;
+    int    send_fd;
+    off_t  send_off;
+    off_t  send_end;
     
     http_header_t http_req;
     pool_t *pool;
@@ -79,13 +80,13 @@ http_server_client_free(http_server_client_t *client) {
     http_server_t *server = client->server;
 
     http_header_clear(&client->http_req);
-    if( client->send_file ) {
-	fclose(client->send_file);
+    if( client->send_fd >= 0 ) {
+	close(client->send_fd);
     }
     if( client->sock ) {
-	sock_close(client->sock);
 	fdselect_unset(server->fdselect, client->sock, FDSELECT_WRITE);
 	fdselect_unset(server->fdselect, client->sock, FDSELECT_READ);
+	sock_close(client->sock);
     }
     if( client->pool ) {
 	pool_delete(client->pool);
@@ -157,6 +158,10 @@ http_server_client_select_read(fdselect_t *sel, fd_t fd, int state, void *arg) {
 		err = 0;
 		break;
 	    }
+	    if( i == 0 ) {
+		err = -1;
+		break;
+	    }
 	    assertb_sockerr(i);
 	}
 	client->recv_len += i;
@@ -185,8 +190,12 @@ http_server_client_select_read(fdselect_t *sel, fd_t fd, int state, void *arg) {
 	err = 404; /* file not found */
 	i = stat(buf, &st);
 	assertb(i==0);
-	client->send_file = fopen(buf, "r");
-	assertb(client->send_file);
+	client->send_fd = open(buf, O_RDONLY);
+	assertb_syserr(client->send_fd >= 0);
+	i = fstat(client->send_fd, &st);
+	assertb_syserr(i >= 0);
+	client->send_off = 0;
+	client->send_end = st.st_size;
 
 	debug(DEBUG_INFO,
 	      ("http_server_client_select_read: sending file=%s\n", buf));
@@ -242,8 +251,10 @@ http_server_client_end_req(http_server_client_t *client) {
 
     do {
 	/* normal EOF, go back to reading */
-	fclose(client->send_file);
-	client->send_file = 0;
+	if( client->send_fd >= 0 ) {
+	    close(client->send_fd);
+	}
+	client->send_fd = -1;
 	fdselect_unset(server->fdselect, client->sock, FDSELECT_WRITE);
 	fdselect_set(server->fdselect, client->sock, FDSELECT_READ, 
 		     http_server_client_select_read, client);
@@ -258,38 +269,34 @@ http_server_client_end_req(http_server_client_t *client) {
 void
 http_server_client_select_write(fdselect_t *sel, fd_t fd, int state, void *arg) {
     http_server_client_t *client = (http_server_client_t*)arg;
-    int i, err=-1;
+    int i, err=-1, closed=0;
     char buf1[1024];
     
     do {
-	if( client->send_len <= 0 ) {
-	    i = fread(client->send_buf, 1, sizeof(client->send_buf), 
-		      client->send_file);
-	    if( i == 0 ) {
-		i = http_server_client_end_req(client);
-		assertb(i==0);
-	    }
-	    assertb(i>0);
-	    client->send_len = i;
-	    client->send_ptr = client->send_buf;
+	if( client->send_off >= client->send_end ) {
+	    err = 0;
+	    closed = 1;
+	    break;
 	}
 
-	i = send(client->sock, client->send_ptr, client->send_len, 0);
-	assertb(i>0);
-
-	client->send_len -= i;
-	client->send_ptr += i;
-
+	i = sendfile(client->sock, client->send_fd, &client->send_off,
+		     client->send_end-client->send_off);
 	debug(DEBUG_INFO,
-	      ("http_server_client_select_write: addr=%s send=%d\n"
+	      ("http_server_client_select_write: addr=%s sendfile=%d\n"
 	       ,iaddr_fmt(&client->addr, buf1, sizeof(buf1))
 	       ,i
 	       ));
+	if( i<0 && sock_wouldblock(client->sock, i) ) {
+	    err = 0;
+	    closed = 1;
+	    break;
+	}
+	assertb_syserr(i>0);
 
-
+	
 	err = 0;
     } while(0);
-    if( err ) {
+    if( err || closed ) {
 	http_server_client_free(client);
     }
 }
@@ -316,9 +323,10 @@ main(int argc, char **argv) {
 	server->accept_sock = socket(AF_INET, SOCK_STREAM, 0);
 	assertb_sockerr(server->accept_sock>=0);
 	i = 1;
-	setsockopt(server->accept_sock, SOL_SOCKET, SO_REUSEADDR, 
-		   (const char*)&i, sizeof(i));
-	addrlen = iaddr_pack(&addr, INADDR_ANY, 8080);
+	i = setsockopt(server->accept_sock, SOL_SOCKET, SO_REUSEADDR, 
+		       (const char*)&i, sizeof(i));
+	assertb_sockerr(i==0);
+	addrlen = iaddr_pack(&addr, INADDR_ANY, 8000);
 	i = bind(server->accept_sock, (struct sockaddr*)&addr, addrlen);
 	assertb_sockerr(i==0);
 	i = listen(server->accept_sock, 5);
