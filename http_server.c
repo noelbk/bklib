@@ -309,7 +309,7 @@ main(int argc, char **argv) {
     struct sockaddr_in addr;
     sockaddrlen_t addrlen;
     int i, err=-1;
-    char buf[4096];
+    char *p, buf[4096];
 
     do {
 	debug_init(DEBUG_INFO, 0, 0);
@@ -317,7 +317,8 @@ main(int argc, char **argv) {
 	sig_init();
 
 	fdselect_init(&fdselect);
-	getcwd(buf, sizeof(buf));
+	p = getcwd(buf, sizeof(buf));
+	assertb_syserr(p);
 	http_server_init(server, &fdselect, buf);
 
 	server->accept_sock = socket(AF_INET, SOCK_STREAM, 0);

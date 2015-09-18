@@ -104,7 +104,7 @@ http_strdup(http_header_t *http, char *str, int len) {
 
 int
 http_header_parse(http_header_t *http, char *buf, size_t len) {
-    char *ptr, *end=buf+len, *p, *q, *word;
+    char *ptr, *end=buf+len, *p, *q, *word=0;
     int is_space, is_nl;
     int line;
     char *line_ptr;
@@ -115,7 +115,7 @@ http_header_parse(http_header_t *http, char *buf, size_t len) {
 
     line = 0;
     line_ptr = buf;
-    state = HTTP_STATE_INIT;
+    state = state_next = HTTP_STATE_INIT;
 
 #define HTTP_HEADER_PARSE_ERROR \
 	    http->error_state = state; \
@@ -403,7 +403,7 @@ http_cgi_args(pool_t *pool, char *src, int src_len) {
     char **pkv=0;
     char *src_end;
     char *buf = 0;
-    char *word;
+    char *word = 0;
     http_keyval_t *node=0, *node_first=0; 
     int i;
     
@@ -481,7 +481,7 @@ url_parse_char(char **strpp, char *c) {
 	strp += 1;
 	buf[0] = strp[0];
 	buf[1] = strp[1];
-	buf[3] = 0;
+	buf[2] = 0;
 	strp  += 2;
 	*c = (char)strtoul(buf, &p, 16);
 	if( !*c && p <= buf ) {

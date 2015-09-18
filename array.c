@@ -86,7 +86,7 @@ array_clear(array_t *self) {
 void*
 array_add(array_t *self, int num) {
     int err=-1;
-    char *p;
+    char *p=0;
 
     do {
 	assertb(self->m_eltsz>0);
@@ -182,7 +182,7 @@ array_copy(array_t *dst, array_t *src) {
 void*
 array_insert(array_t *dst, int idx, void *elts, int nelts) {
     int err=-1;
-    char *start, *end;
+    char *start=0, *end;
 
     do {
 	if( nelts <=0 ) {
@@ -206,7 +206,7 @@ array_insert(array_t *dst, int idx, void *elts, int nelts) {
 void*
 array_append(array_t *dst, void *elt, int nelts) {
     int err=-1;
-    char *p;
+    char *p=0;
 
     do {
 	if( nelts <=0 ) {

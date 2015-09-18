@@ -89,7 +89,7 @@ main(int argc, char **argv) {
     dns_t dns, dns_query, dns_reply;
     int i, n;
     char buf[4096], reply_buf[4096], buf2[4096], query_buf[4096];
-    u8 addr[] = {1, 2, 3, 4};
+    u32 addr = (1<<24) | (2<<16) | (3<<8) | (4);
     char *hostname = "home.noel.p2p.bkbox.com";
     
     debug_init(DEBUG_INFO, 0, 0);
@@ -107,12 +107,11 @@ main(int argc, char **argv) {
 	      ("dns_check_query_in_a i=%d buf=%s\n", i, buf));
 
 	dns_init(&dns_reply, reply_buf, sizeof(reply_buf));
-	i = dns_pack_reply_in_a(&dns_reply, &dns_query, *(u32*)addr, 1);
+	i = dns_pack_reply_in_a(&dns_reply, &dns_query, addr, 1);
 	debug(DEBUG_INFO,  
 	      ("dns_pack_reply_in_a i=%d s=%s\n"
 	       ,i
 	       ,dns_fmt(&dns_reply, buf, sizeof(buf))
-	       ,memdump(buf2, sizeof(buf2), reply_buf, i)
 	       ));
 
 	dns_free(&dns_query);
@@ -159,7 +158,6 @@ main(int argc, char **argv) {
 	debug(DEBUG_INFO,  
 	      ("sendto raw query to %s\n"
 	       ,netpkt_ntoa(addr.sin_addr.s_addr, 0)
-	       ,memdump(buf2, sizeof(buf2), query, sizeof(query))
 	       ));
 
 	i = sendto(sock, query, sizeof(query), 0,
@@ -171,8 +169,7 @@ main(int argc, char **argv) {
 
 	debug(DEBUG_INFO,  
 	      ("recvfrom raw query from %s\n", 
-	       netpkt_ntoa(addr.sin_addr.s_addr, 0)
-	       , memdump(buf2, sizeof(buf2), buf, n)));
+	       netpkt_ntoa(addr.sin_addr.s_addr, 0)));
 	
 	debug(DEBUG_INFO,  ("\n"));
 	dns_init(&dns, buf, n);

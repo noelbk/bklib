@@ -182,7 +182,7 @@ dns_proxy_forward(dns_proxy_t *proxy, char *buf, int len,
 	    assertb(n==(int)dns.buflen);
 	    
 	    debug(DEBUG_INFO,
-		  ("forwarded req id=%lx for host=%s to addr=%s buflen=%d sendto=%d\n",
+		  ("forwarded req id=%x for host=%s to addr=%s buflen=%d sendto=%d\n",
 		   req.id,
 		   req.hostname, 
 		   iaddr_fmt(paddr, 0, 0),
@@ -232,7 +232,7 @@ dns_proxy_select_recv(fdselect_t *sel, fd_t sock, int events, void *arg) {
 	assertb(i>=0);
 
 	debug(DEBUG_INFO,
-	      ("received reply from addr=%s reply_id=%lx\n",
+	      ("received reply from addr=%s reply_id=%x\n",
 	       iaddr_fmt(&addr, 0, 0), dns.id));
 
 	// find a proxied request by the dns id

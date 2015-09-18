@@ -304,7 +304,7 @@ dns_rr_pack(dns_t *dns, int net2host, dns_rr_t *rr) {
 	if( i <= 0 ) {
 	    char buf[16384];
 	    debug(DEBUG_WARN, 
-		  ("dns_rr_pack i=%d net2host=%d dns->ptr=%d buf=\n%s\n"
+		  ("dns_rr_pack i=%d net2host=%d dns->ptr=%ld buf=\n%s\n"
 		   , i, net2host, dns->ptr-dns->buf
 		   , memdump(buf, sizeof(buf), dns->buf, dns->end - dns->buf)
 		   ));

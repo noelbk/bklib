@@ -9,7 +9,7 @@
 
 char*
 http_req_state_fmt(http_req_state_t state, char *buf, int len) {
-    char *s;
+    char *s=0;
     switch(state) {
     case HTTP_REQ_RESOLVE: s = "HTTP_REQ_RESOLVE"; break;
     case HTTP_REQ_CONNECT: s = "HTTP_REQ_CONNECT"; break;
@@ -31,7 +31,7 @@ http_get(char *urlstr, http_req_func_t func, void *farg) {
     sock_t sock;
     int url_parsed=0;
     char buf[16384], buf1[1024];
-    size_t len;
+    size_t len=0;
     http_header_t http;
     http_req_t req;
     int got_header = 0;

@@ -5,7 +5,7 @@
 l = .a
 o = .o
 x = 
-CFLAGS = -Wall -g -I. -I.. # -O2 -pg
+CFLAGS = -Wall -g -I. -I.. -O2 # -pg
 LFLAGS = -g # -O2 -pg
 LINK_EXE = $(CC) $(LFLAGS) -o $@
 #LINK_LIB = ar r $@ 

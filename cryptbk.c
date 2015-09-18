@@ -471,7 +471,7 @@ utc2time(ASN1_UTCTIME *utc) {
 	if( t < 0 ) {
 	    debug(DEBUG_WARN, 
 		  ("utc2time: t=%d, tm={%d,%d,%d,%d,%d,%d} utc->data=[%s]\n"
-		   ,t 
+		   ,(int)t 
 		   ,tm.tm_year
 		   ,tm.tm_mon
 		   ,tm.tm_mday

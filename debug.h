@@ -29,8 +29,9 @@ int
 debug_hdr(int level, const char *file, int line);
 
 int
-debugf(const char *fmt, ...);
-
+debugf(const char *fmt, ...)
+    __attribute__ ((format (printf, 1, 2)));
+    
 #define debug_v debugf
 
 extern debug_func_t  debug_func;

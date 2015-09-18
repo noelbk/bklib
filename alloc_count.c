@@ -32,7 +32,7 @@ alloc_count_add(void *ptr, size_t len, char *file, int line) {
 	alloc_count_info_t *pinfo = (alloc_count_info_t*)node->node_val;
 
 	debug(DEBUG_WARN,
-	      ("alloc_count_add: ptr=%p len=%d alloced twice at %s:%d and %s:%d\n",
+	      ("alloc_count_add: ptr=%p len=%lu alloced twice at %s:%d and %s:%d\n",
 	       ptr, len, pinfo->file, pinfo->line, file, line));
 
 	pinfo->count++;
@@ -73,7 +73,7 @@ alloc_count_free(void *ptr, char *file, int line) {
 int
 alloc_count_dump_foreach(hash_t *hash, hash_node_t *node, void *arg) {
     alloc_count_info_t *info = (alloc_count_info_t*)node->node_val;
-    debugf("alloc_count_dump: ptr=%p len=%d at %s:%d\n",
+    debugf("alloc_count_dump: ptr=%p len=%lu at %s:%d\n",
 	   info->ptr, info->len, info->file, info->line);
     return 0;
 }

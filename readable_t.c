@@ -66,4 +66,6 @@ main(int argc, char **argv) {
 	readable_metric(d, "", buf, sizeof(buf));
 	printf("readable=%s d=%g\n", buf, d);
     }
+
+    return 0;
 }
