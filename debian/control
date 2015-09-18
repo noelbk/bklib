@@ -1,0 +1,19 @@
+Source: bklib
+Priority: optional
+Maintainer: Noel Burton-Krahn <noel@burton-krahn.com>
+Build-Depends: debhelper (>= 4.0.0)
+Standards-Version: 3.6.1
+
+Package: bklib-dev
+Section: libdev
+Architecture: any
+Depends: bklib (= ${Source-Version})
+Description: <insert up to 60 chars description>
+ <insert long description, indented with spaces>
+
+Package: bklib
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: <insert up to 60 chars description>
+ <insert long description, indented with spaces>

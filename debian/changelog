@@ -1,0 +1,19 @@
+bklib (0.01-3) unstable; urgency=low
+
+  * added include/array_inline.c
+  * added alloc_count*.[ch]
+
+ -- Noel Burton-Krahn <noel@burton-krahn.com>  Thu, 21 Apr 2005 14:37:25 -0700
+
+bklib (0.01-2) unstable; urgency=low
+
+  * fixed 'make clean', included .deps in tarball
+
+ -- Noel Burton-Krahn <noel@burton-krahn.com>  Thu, 21 Apr 2005 12:50:39 -0700
+
+bklib (0.01-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Noel Burton-Krahn <noel@burton-krahn.com>  Thu, 21 Apr 2005 09:57:29 -0700
+
