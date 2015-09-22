@@ -29,7 +29,7 @@ install: .phony
 
 install_lib=libbk$l libbklogon$l cryptbk$l
 
-install_h=array.h bitops.h cfg.h cfg_crypt.h config.h configbk.h cryptbk.h debug.h debug_leak.h debug_stdio.h defutil.h dir.h dns.h dns_proxy.h env.h eth_util.h fdselect.h fdselect_pipe.h hash.h http.h http_req.h ifcfg.h ipconfig.h ipconntrack.h itypes.h llist.h logon.h memutil.h mstime.h netpkt.h netpkt_inet.h opt.h os_unix.h os_win32.h pack.h pool.h proc.h rand.h readable.h rtt.h service.h sig.h sock.h sock_raw.h sock_send_fd.h state.h str.h test_certs.h thread.h tstat.h update.h variant.h vercmp.h warn.h warn_unix.h warn_win32.h array_inline.c alloc_count.h opt_print.h console.h
+install_h=array.h bitops.h cfg.h cfg_crypt.h config.h configbk.h cryptbk.h debug.h debug_array.h debug_leak.h debug_stdio.h defutil.h dir.h dns.h dns_proxy.h env.h eth_util.h fdselect.h fdselect_pipe.h hash.h http.h http_req.h ifcfg.h ipconfig.h ipconntrack.h itypes.h llist.h logon.h memutil.h mstime.h netpkt.h netpkt_inet.h opt.h os_unix.h os_win32.h pack.h pool.h proc.h rand.h readable.h rtt.h service.h sig.h sock.h sock_raw.h sock_send_fd.h state.h str.h test_certs.h thread.h tstat.h update.h variant.h vercmp.h warn.h warn_unix.h warn_win32.h array_inline.c alloc_count.h opt_print.h console.h
 
 install-dev: $(install_lib) $(install_h) .phony
 	mkdir -p $(DESTDIR)/usr/lib
@@ -178,7 +178,7 @@ cryptbk_req_libs = $(libbk_libs)
 cryptbk_req$x: $(cryptbk_req_objs)
 	$(LINK_EXE) $(cryptbk_req_objs) $(cryptbk_req_libs) 
 
-libbk_objs=tstat$o pool$o readable$o array$o fdselect$o fdselect_pipe$o hash$o http$o http_req$o mstime$o rand$o sock$o debug$o debug_leak$o memutil$o eth_util$o netpkt$o state$o proc$o shell$o cfg$o dir$o debug_stdio$o opt$o opt_print$o sig$o str$o dns$o env$o thread$o service$o ipconntrack$o dns_proxy$o vercmp$o alloc_count$o ifcfg$o ipconfig$o console$o $(libbk_objs_os)
+libbk_objs=tstat$o pool$o readable$o array$o fdselect$o fdselect_pipe$o hash$o http$o http_req$o mstime$o rand$o sock$o debug$o debug_leak$o memutil$o eth_util$o netpkt$o state$o proc$o shell$o cfg$o dir$o debug_array$o debug_stdio$o opt$o opt_print$o sig$o str$o dns$o env$o thread$o service$o ipconntrack$o dns_proxy$o vercmp$o alloc_count$o ifcfg$o ipconfig$o console$o $(libbk_objs_os)
 libbk_libs = $(libbk_libs_os)
 libbk$l: $(libbk_objs)
 	$(LINK_LIB) $(libbk_objs) 
