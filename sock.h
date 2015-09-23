@@ -63,7 +63,7 @@ int iaddr_pack(struct sockaddr_in *addr, long ip, int port);
 // formats addr as ip:port
 char *iaddr_fmt(struct sockaddr_in *addr, char *buf, int len);
 
-// converts ip:port to a sockaddr_in.  returns 0 iff ok.
+// converts "port" or "host:port" or to a sockaddr_in.  returns addrlen iff ok.
 int iaddr_parse(struct sockaddr_in *addr, char *ip_port);
 
 char *iaddr_ntoa(unsigned long i, char *buf);

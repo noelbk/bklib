@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+
 #include "config.h"
 
 #if OS == OS_UNIX
@@ -47,32 +49,32 @@ iaddr_fmt(struct sockaddr_in *addr, char *buf, int len) {
 // converts ip:port to a sockaddr_in.  returns 0 iff ok.
 int
 iaddr_parse(struct sockaddr_in *addr, char *ip_port) {
-    int i, n, err=-1;
+    int err=-1;
     unsigned long ip;
     int port;
-    char *buf = ip_port;
-    char *p;
-    char hostname[4096];
+    char buf[4096];
+    char *p, *q;
 
     do {
 	memset(addr, 0, sizeof(*addr));
     
-	strncpy(hostname, buf, sizeof(hostname)-1);
-	hostname[sizeof(hostname)-1] = 0;
+	strncpy(buf, ip_port, sizeof(buf)-1);
+	buf[sizeof(buf)-1] = 0;
 	
-	p = strchr(hostname, ':');
-	if( p ) { *p = 0; }
-
-	ip = inet_resolve(hostname);
-	assertb(ip != INADDR_NONE);
-
-	buf += strlen(hostname);
-	
-	port = 0;
-	i = sscanf(buf, ":%d%n", &port, &n);
-	if( i == 1) {
-	    buf += n;
+	p = strchr(buf, ':');
+	if( p ) {
+	    *p++ = 0;
+	    ip = inet_resolve(buf);
+	    assertb(ip != INADDR_NONE);
 	}
+	else {
+	    p = buf;
+	    ip = INADDR_ANY;
+	}
+
+	port = strtoul(p, &q, 0);
+	assertb(q>p);
+	assertb(port >= 0);
 	err = iaddr_pack(addr, ip, port);
     } while(0);
     return err;
