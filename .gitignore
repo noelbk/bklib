@@ -10,3 +10,7 @@
 *.lib
 *_t
 server
+client
+http_get
+http_server
+service_install

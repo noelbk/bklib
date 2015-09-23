@@ -19,7 +19,7 @@
 
 compile_test = service_t$x service_control_t$x hash_t$x array_t$x array_bsearch_t$x cryptbk_t$x cryptbk_md5_t$x netpkt_t$x logon_t$x pool_t$x proc_pipe_t$x http_t$x alloc_count_t$x debug_leak_t$x ifcfg_t$x ipconfig_t$x dns_t$x fdselect_pipe_t$x readable_t$x 
 
-compile_bin = service_install$x http_get$x http_server$x server$x
+compile_bin = service_install$x http_get$x http_server$x server$x client$x
 
 compile_lib = libbk$l libbklogon$l cryptbk$l libbkdebug$l
 compile_all = $(compile_lib) $(compile_bin) $(compile_test)
@@ -92,6 +92,11 @@ http_get_objs=http_get$o libbk$l
 http_get_libs=$(libbk_libs)
 http_get$x: $(http_get_objs)
 	$(LINK_EXE) $(http_get_objs) $(http_get_libs)
+
+client_objs=client$o libbk$l
+client_libs=$(libbk_libs)
+client$x: $(client_objs)
+	$(LINK_EXE) $(client_objs) $(client_libs)
 
 server_objs=server$o libbk$l
 server_libs=$(libbk_libs)
