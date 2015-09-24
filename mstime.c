@@ -1,16 +1,16 @@
 #include "configbk.h"
 
 #include <time.h>
-#include <sys/timeb.h>
+#include <sys/time.h>
 #include "mstime.h"
 
 mstime_t
 mstime() {
-    struct timeb tb;
-
-    tb.dstflag = -1;
-    ftime(&tb);
-    return (mstime_t)tb.time + 1.0e-3 * tb.millitm;
+    struct timeval tv;
+    struct timezone tz;
+    
+    gettimeofday(&tv, &tz);
+    return (mstime_t)tv.tv_sec + 1.0e-6 * tv.tv_usec;
 }
 char *
 mstime_fmt(mstime_t t, char *buf, int len) {
