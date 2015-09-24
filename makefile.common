@@ -17,7 +17,7 @@
 
 #---------------------------------------------------------------------
 
-compile_test = service_t$x service_control_t$x hash_t$x array_t$x array_bsearch_t$x cryptbk_t$x cryptbk_md5_t$x netpkt_t$x logon_t$x pool_t$x proc_pipe_t$x http_t$x alloc_count_t$x debug_leak_t$x ifcfg_t$x ipconfig_t$x dns_t$x fdselect_pipe_t$x readable_t$x 
+compile_test = service_t$x service_control_t$x hash_t$x array_t$x array_bsearch_t$x cryptbk_t$x cryptbk_md5_t$x netpkt_t$x logon_t$x pool_t$x proc_pipe_t$x http_t$x alloc_count_t$x debug_leak_t$x ifcfg_t$x ipconfig_t$x dns_t$x fdselect_pipe_t$x readable_t$x mmap_t$x
 
 compile_bin = service_install$x http_get$x http_server$x server$x client$x ns$x
 
@@ -143,6 +143,11 @@ ipconntrack_t_libs=$(libbk_libs)
 ipconntrack_t$x: $(ipconntrack_t_objs)
 	$(LINK_EXE) $(ipconntrack_t_objs) $(ipconntrack_t_libs)
 
+mmap_t_objs=mmap_t$o libbk$l
+mmap_t_libs=$(libbk_libs)
+mmap_t$x: $(mmap_t_objs)
+	$(LINK_EXE) $(mmap_t_objs) $(mmap_t_libs)
+
 t_gmt_objs=t_gmt$o libbk$l
 t_gmt_libs=$(libbk_libs)
 t_gmt$x: $(t_gmt_objs)
@@ -189,7 +194,48 @@ cryptbk_req_libs = $(libbk_libs)
 cryptbk_req$x: $(cryptbk_req_objs)
 	$(LINK_EXE) $(cryptbk_req_objs) $(cryptbk_req_libs) 
 
-libbk_objs=tstat$o pool$o readable$o array$o fdselect$o fdselect_pipe$o hash$o http$o http_req$o mstime$o rand$o sock$o debug$o debug_leak$o memutil$o eth_util$o netpkt$o state$o proc$o shell$o cfg$o dir$o debug_array$o debug_stdio$o opt$o opt_print$o sig$o str$o dns$o env$o thread$o service$o ipconntrack$o dns_proxy$o vercmp$o alloc_count$o ifcfg$o ipconfig$o console$o $(libbk_objs_os)
+libbk_objs=tstat$o \
+pool$o \
+readable$o \
+array$o \
+fdselect$o \
+fdselect_pipe$o \
+hash$o \
+http$o \
+http_req$o \
+mstime$o \
+rand$o \
+sock$o \
+debug$o \
+debug_leak$o \
+memutil$o \
+eth_util$o \
+netpkt$o \
+state$o \
+proc$o \
+shell$o \
+cfg$o \
+dir$o \
+debug_array$o \
+debug_stdio$o \
+opt$o \
+opt_print$o \
+sig$o \
+str$o \
+dns$o \
+env$o \
+thread$o \
+service$o \
+ipconntrack$o \
+dns_proxy$o \
+vercmp$o \
+alloc_count$o \
+ifcfg$o \
+ipconfig$o \
+console$o \
+mmap$o \
+$(libbk_objs_os)
+
 libbk_libs = $(libbk_libs_os)
 libbk$l: $(libbk_objs)
 	$(LINK_LIB) $(libbk_objs) 
@@ -280,7 +326,7 @@ vercmp_t$x: $(vercmp_t_objs)
 	$(LINK_EXE) $(vercmp_t_objs) $(libbk_libs)
 
 # fdselect_t$x only works under windows
-test_exe = opt_t$x rand_t$x hash_t$x array_t$x array_bsearch_t$x logon_t$x thread_t$x vercmp_t$x 
+test_exe = opt_t$x rand_t$x hash_t$x array_t$x array_bsearch_t$x logon_t$x thread_t$x vercmp_t$x mmap_t$x
 test: $(test_exe)
 
 deps= \
