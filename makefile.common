@@ -234,6 +234,7 @@ ifcfg$o \
 ipconfig$o \
 console$o \
 mmap$o \
+sendlist$o \
 $(libbk_objs_os)
 
 libbk_libs = $(libbk_libs_os)
@@ -325,8 +326,15 @@ vercmp_t_objs = vercmp_t$o libbk$l
 vercmp_t$x: $(vercmp_t_objs)
 	$(LINK_EXE) $(vercmp_t_objs) $(libbk_libs)
 
+sendlist_t_objs = sendlist_t$o libbk$l
+sendlist_t$x: $(sendlist_t_objs)
+	$(LINK_EXE) $(sendlist_t_objs) $(libbk_libs)
+
 # fdselect_t$x only works under windows
-test_exe = opt_t$x rand_t$x hash_t$x array_t$x array_bsearch_t$x logon_t$x thread_t$x vercmp_t$x mmap_t$x
+test_exe = opt_t$x rand_t$x hash_t$x array_t$x array_bsearch_t$x logon_t$x thread_t$x vercmp_t$x \
+  mmap_t$x \
+  sendlist_t$x
+  
 test: $(test_exe)
 
 deps= \
