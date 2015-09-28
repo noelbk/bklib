@@ -1,3 +1,18 @@
+/*
+
+mmap_t.c - test mmap functions and compare with read/write
+
+Surprisingly, read/write is usually faster!  This seems to average out
+as the number of read/writes increases, but mmap never seems to be
+clearly much faster.
+
+    random read=4992 write=5008 op_read_max=10000
+    read: 0.058235s
+    mmap: 0.141745s
+    op checksum ok: d8d8d
+    file cmp ok: 1000000000
+
+ */
 #define _GNU_SOURCE         /* See feature_test_macros(7) */
 #include <sys/mman.h>
 #include <sys/stat.h>
@@ -173,6 +188,12 @@ main(int argc, char **argv) {
 	    ops[i].off = randi(SIZE_MAX);
 	    ops[i].len = 1 + randi(MIN(OP_READ_MAX, SIZE_MAX - ops[i].off) - 1);
 	    ops[i].op = OP_READ + randi(1);
+	    if( i==0 ) {
+		ops[i].op = OP_WRITE;
+		ops[i].off = SIZE_MAX-1;
+		ops[i].len = 1;
+	    }
+	    
 	    if( i==0 || ops[i].off + ops[i].len > maxlen ) {
 		ops[i].op = OP_WRITE;
 		maxlen = ops[i].off + ops[i].len;
@@ -188,6 +209,7 @@ main(int argc, char **argv) {
 	debugf("random read=%d write=%d op_read_max=%d\n",
 	       num_read, num_write, OP_READ_MAX);
 
+	// test_read
 	snprintf(path_read, sizeof(path_read), "/tmp/t_readXXXXXX");
 	fd_read = mkstemp(path_read);
 	assertb_syserr(fd_read>=0);
@@ -199,6 +221,7 @@ main(int argc, char **argv) {
 	assertb_syserr(!e);
 	assertb(st.st_size == maxlen);
 
+	// test_mmap
 	snprintf(path_mmap, sizeof(path_mmap), "/tmp/t_mmapXXXXXX");
 	fd_mmap = mkstemp(path_mmap);
 	assertb_syserr(fd_mmap>=0);
