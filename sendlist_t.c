@@ -1,7 +1,10 @@
 /* 
  * USAGE
- *   ./sendlist_t -clients 7 -bytes 10000000 -readlen $((65536*4)) 2>out; tail out
- *   ./sendlist_t -clients 7 -bytes 10000000 -readlen $((65536*4)) -threaded 2>out; tail out
+ *   ./sendlist_t -clients 5 -bytes 10000000 -readbuf $((65536*4)) 2>out; tail out
+ *     sent 20Mb through 5 clients in 0.110757 secs. read_buflen=262144. 903Mb/s
+ *
+ *   ./sendlist_t -clients 5 -bytes 10000000 -readbuf $((65536*4)) -threaded 2>out; tail out
+ *     sent 20Mb through 5 clients in 0.0417428 secs. read_buflen=262144. 2.4Gb/s
  *
  */
 #include <stdlib.h>
@@ -378,6 +381,8 @@ main(int argc, char **argv) {
 	rand_fd = -1;
 	lseek(tmp_fd, 0, SEEK_SET);
 		   
+	t0 = mstime();
+	
 	e = sendlist_send_fd(&clients[0].sendlist, tmp_fd, 0, tmp_len, client0_sendbuf_free, &clients[0]);
 	assertb(e>=0);
 	clients[0].sending++;
@@ -401,7 +406,6 @@ main(int argc, char **argv) {
 	       ,"send_sum"
 	       );
 
-	t0 = mstime();
 	if( test == TEST_THREADS ) {
 	    for(idx=0; idx<num_clients; idx++) {
 		client_t *client = clients + idx;
